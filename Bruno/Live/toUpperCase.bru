@@ -1,0 +1,17 @@
+meta {
+  name: toUpperCase
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/toUpperCase
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "value": "hola caracola"
+  }
+}
