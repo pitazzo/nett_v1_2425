@@ -1,0 +1,18 @@
+meta {
+  name: add
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3000/add
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "a": 1,
+    "b": 2
+  }
+}

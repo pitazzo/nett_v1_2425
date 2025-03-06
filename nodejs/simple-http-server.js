@@ -22,6 +22,41 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (url === "/add" && method === "POST") {
+    let raw = "";
+    for await (const chunk of req) {
+      raw += chunk;
+    }
+
+    let body;
+
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      res.writeHead(400);
+      res.end("Please provide a valid JSON body such as {'a': 2, 'b': 3}");
+      return;
+    }
+
+    const a = parseInt(body["a"]);
+    const b = parseInt(body["b"]);
+
+    if (!a || !b) {
+      res.writeHead(400);
+      res.end("Please provide valid numbers for a and b");
+      return;
+    }
+
+    const response = {
+      result: a + b,
+    };
+
+    res.writeHead(200);
+    res.end(JSON.stringify(response));
+
+    return;
+  }
+
   res.writeHead(404);
   res.end("Method not found");
 });
