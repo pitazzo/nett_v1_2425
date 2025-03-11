@@ -85,6 +85,60 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (endpoint === "movies" && !rawParam && method === "POST") {
+    const body = await parseBody(req);
+
+    const title = body["title"];
+    const director = body["director"];
+    const year = parseInt(body["year"]);
+    const duration = parseInt(body["duration"]);
+    const isSaga = body["isSaga"];
+
+    if (!title || title.length < 3 || typeof title !== "string") {
+      res.writeHead(400);
+      res.end("Please provide a valid movie title");
+      return;
+    }
+
+    if (!director || director.length < 3 || typeof director !== "string") {
+      res.writeHead(400);
+      res.end("Please provide a valid movie director");
+      return;
+    }
+
+    if (!year || year < 1800 || year > new Date().getFullYear()) {
+      res.writeHead(400);
+      res.end("Please provide a valid movie year");
+      return;
+    }
+
+    if (!duration || duration < 1) {
+      res.writeHead(400);
+      res.end("Please provide a valid movie duration");
+      return;
+    }
+
+    if (typeof isSaga != "boolean") {
+      res.writeHead(400);
+      res.end("Please provide a valid movie isSaga value");
+      return;
+    }
+
+    const newMovie = {
+      id: db.length + 1,
+      title: title,
+      year: year,
+      director: director,
+      duration: duration,
+      isSaga: isSaga,
+    };
+    db.push(newMovie);
+
+    res.writeHead(201);
+    res.end(JSON.stringify(newMovie));
+    return;
+  }
+
   res.writeHead(404);
   res.end("Method not found");
 });
