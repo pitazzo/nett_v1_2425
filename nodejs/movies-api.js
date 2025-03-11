@@ -139,6 +139,14 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (endpoint === "movies" && rawParam && method === "DELETE") {
+    //deberes para el martes que viene...
+    // - ¿qué pasa si me mandan un rawParam que no es un id bueno?
+    // - ¿qué pasa si me piden borrar una peli que no existe?
+    // - ¿qué devuelvo?
+    // - ¿cómo actualizo mi db?
+  }
+
   res.writeHead(404);
   res.end("Method not found");
 });
