@@ -27,6 +27,18 @@ const db = [
   },
 ];
 
+async function parseBody(req) {
+  let raw = "";
+  for await (const chunk of req) {
+    raw += chunk;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
 const server = http.createServer(async (req, res) => {
   const url = req.url;
   const method = req.method;
@@ -34,8 +46,20 @@ const server = http.createServer(async (req, res) => {
   const [, endpoint, rawParam] = url.split("/");
 
   if (endpoint === "movies" && !rawParam && method === "GET") {
+    const body = await parseBody(req);
+
+    const isSaga = body["isSaga"];
+
+    let result;
+
+    if (isSaga === undefined) {
+      result = db;
+    } else {
+      result = db.filter((movie) => movie.isSaga === isSaga);
+    }
+
     res.writeHead(200);
-    res.end(JSON.stringify(db));
+    res.end(JSON.stringify(result));
     return;
   }
 

@@ -6,6 +6,12 @@ meta {
 
 get {
   url: http://localhost:3000/movies
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "isSaga": true
+  }
 }
