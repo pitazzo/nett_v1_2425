@@ -140,11 +140,28 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (endpoint === "movies" && rawParam && method === "DELETE") {
-    //deberes para el martes que viene...
-    // - ¿qué pasa si me mandan un rawParam que no es un id bueno?
-    // - ¿qué pasa si me piden borrar una peli que no existe?
-    // - ¿qué devuelvo?
-    // - ¿cómo actualizo mi db?
+    const param = parseInt(rawParam);
+
+    if (!param) {
+      res.writeHead(400);
+      res.end("Please provide a valid movie ID");
+      return;
+    }
+
+    const index = db.findIndex((movie) => param === movie.id);
+
+    if (index === -1) {
+      res.writeHead(404);
+      res.end(`Movie with ID ${param} was not found`);
+      return;
+    }
+
+    const deletedMovie = db.splice(index, 1);
+
+    res.writeHead(200);
+    res.end(JSON.stringify(deletedMovie));
+
+    return;
   }
 
   res.writeHead(404);
