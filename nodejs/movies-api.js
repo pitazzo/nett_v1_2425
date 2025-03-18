@@ -1,5 +1,6 @@
 const http = require("http");
 const { v4: uuidv4, validate: uuidValidate } = require("uuid");
+require("dotenv").config();
 
 const db = [
   {
@@ -40,7 +41,7 @@ async function parseBody(req) {
   }
 }
 
-const server = http.createServer(async (req, res) => {
+async function handleRequest(req, res) {
   const url = req.url;
   const method = req.method;
 
@@ -163,8 +164,28 @@ const server = http.createServer(async (req, res) => {
 
   res.writeHead(404);
   res.end("Method not found");
+}
+
+async function checkApiKeyMiddleware(req, res, next) {
+  const key = req.headers["authorization"];
+
+  if (key !== process.env.API_KEY) {
+    res.writeHead(401);
+    res.end("Please provide a valid API key in header authorization");
+    return;
+  }
+
+  next(req, res);
+}
+
+const server = http.createServer(async (req, res) => {
+  checkApiKeyMiddleware(req, res, (req, res) => {
+    handleRequest(req, res);
+  });
 });
 
-server.listen(3000, () => {
-  console.log("movies API is running at http://localhost:3000 🎬");
+server.listen(process.env.PORT, () => {
+  console.log(
+    `movies API is running at http://localhost:${process.env.PORT} 🎬`
+  );
 });
