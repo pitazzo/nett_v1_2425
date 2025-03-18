@@ -166,6 +166,19 @@ async function handleRequest(req, res) {
   res.end("Method not found");
 }
 
+async function logger(req, res, next) {
+  if (process.env.USE_LOGGER !== "false") {
+    const now = new Date();
+    console.log(
+      `[${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}] ${
+        req.method
+      } ${req.url}`
+    );
+  }
+
+  next(req, res);
+}
+
 async function checkApiKeyMiddleware(req, res, next) {
   const key = req.headers["authorization"];
 
@@ -179,8 +192,10 @@ async function checkApiKeyMiddleware(req, res, next) {
 }
 
 const server = http.createServer(async (req, res) => {
-  checkApiKeyMiddleware(req, res, (req, res) => {
-    handleRequest(req, res);
+  logger(req, res, (req, res) => {
+    checkApiKeyMiddleware(req, res, (req, res) => {
+      handleRequest(req, res);
+    });
   });
 });
 
