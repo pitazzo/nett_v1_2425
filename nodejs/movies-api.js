@@ -1,8 +1,9 @@
 const http = require("http");
+const { v4: uuidv4, validate: uuidValidate } = require("uuid");
 
 const db = [
   {
-    id: 1,
+    id: "2aa1cc7c-ae73-4a21-b354-f19b243a7e5b",
     title: "La naranaja mecánica",
     year: 1972,
     duration: 120,
@@ -10,7 +11,7 @@ const db = [
     isSaga: false,
   },
   {
-    id: 2,
+    id: "58e816d4-4969-4276-866e-a0832af9a5fc",
     title: "El Apartamento",
     year: 1964,
     duration: 90,
@@ -18,7 +19,7 @@ const db = [
     isSaga: false,
   },
   {
-    id: 3,
+    id: "13577b18-bdce-4127-a951-4a4215334404",
     title: "Harry Potter I",
     year: 2002,
     duration: 100,
@@ -43,9 +44,9 @@ const server = http.createServer(async (req, res) => {
   const url = req.url;
   const method = req.method;
 
-  const [, endpoint, rawParam] = url.split("/");
+  const [, endpoint, param] = url.split("/");
 
-  if (endpoint === "movies" && !rawParam && method === "GET") {
+  if (endpoint === "movies" && !param && method === "GET") {
     const body = await parseBody(req);
 
     const isSaga = body["isSaga"];
@@ -63,12 +64,10 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (endpoint === "movies" && rawParam && method === "GET") {
-    const param = parseInt(rawParam);
-
-    if (!param) {
+  if (endpoint === "movies" && param && method === "GET") {
+    if (!uuidValidate(param)) {
       res.writeHead(400);
-      res.end("Please provide a valid movie ID");
+      res.end("Please provide a valid movie UUID");
       return;
     }
 
@@ -76,7 +75,7 @@ const server = http.createServer(async (req, res) => {
 
     if (!movie) {
       res.writeHead(404);
-      res.end(`Movie with ID ${param} was not found`);
+      res.end(`Movie with UUID ${param} was not found`);
       return;
     }
 
@@ -85,7 +84,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (endpoint === "movies" && !rawParam && method === "POST") {
+  if (endpoint === "movies" && !param && method === "POST") {
     const body = await parseBody(req);
 
     const title = body["title"];
@@ -125,7 +124,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     const newMovie = {
-      id: db.length + 1,
+      id: uuidv4(),
       title: title,
       year: year,
       director: director,
@@ -139,12 +138,10 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (endpoint === "movies" && rawParam && method === "DELETE") {
-    const param = parseInt(rawParam);
-
-    if (!param) {
+  if (endpoint === "movies" && param && method === "DELETE") {
+    if (!uuidValidate(param)) {
       res.writeHead(400);
-      res.end("Please provide a valid movie ID");
+      res.end("Please provide a valid movie UUID");
       return;
     }
 
@@ -152,7 +149,7 @@ const server = http.createServer(async (req, res) => {
 
     if (index === -1) {
       res.writeHead(404);
-      res.end(`Movie with ID ${param} was not found`);
+      res.end(`Movie with UUIID ${param} was not found`);
       return;
     }
 
