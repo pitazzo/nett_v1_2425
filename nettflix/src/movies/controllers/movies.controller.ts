@@ -6,24 +6,29 @@ import {
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
+import { MoviesService } from 'src/movies/services/movies.service';
 
 @Controller()
 export class MoviesController {
+  constructor(private readonly moviesService: MoviesService) {}
+
   @Get('movies')
   getAllMovies() {
-    console.log('soy el controller de getAllMovies');
+    return this.moviesService.getAllMovies();
   }
 
   @Get('movies/:id')
   getMovie(@Param('id', ParseUUIDPipe) id: string) {
-    console.log(
-      `soy el controller de getMovie y me piden la peli con ID ${id}`,
-    );
+    return this.moviesService.getMovie(id);
   }
 
   @Post('movies')
   createMovie() {}
 
   @Delete('movies/:id')
-  deleteMovie() {}
+  deleteMovie(@Param('id', ParseUUIDPipe) id: string) {
+    console.log(
+      `soy el controller de deleteMovie y me piden borrar la peli con ID ${id}`,
+    );
+  }
 }
