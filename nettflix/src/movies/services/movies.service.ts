@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
+import { UpdateMovieDto } from 'src/movies/dtos/update-movie.dto';
 import { Movie } from 'src/movies/models/movie.model';
 import { v4 as uuidv4 } from 'uuid';
 @Injectable()
@@ -56,5 +57,15 @@ export class MoviesService {
     const movie = { id: uuidv4(), ...dto };
     this.db.push(movie);
     return movie;
+  }
+
+  update(id: string, dto: UpdateMovieDto) {
+    const movie = this.get(id);
+    const index = this.db.findIndex((movie) => movie.id === id);
+    const updateMovie = { ...movie, ...dto };
+
+    this.db[index] = updateMovie;
+
+    return updateMovie;
   }
 }
