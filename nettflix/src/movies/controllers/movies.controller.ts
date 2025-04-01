@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -6,6 +7,7 @@ import {
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
+import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
 import { MoviesService } from 'src/movies/services/movies.service';
 
 @Controller()
@@ -14,19 +16,21 @@ export class MoviesController {
 
   @Get('movies')
   getAllMovies() {
-    return this.moviesService.getAllMovies();
+    return this.moviesService.getAll();
   }
 
   @Get('movies/:id')
   getMovie(@Param('id', ParseUUIDPipe) id: string) {
-    return this.moviesService.getMovie(id);
+    return this.moviesService.get(id);
   }
 
   @Post('movies')
-  createMovie() {}
+  createMovie(@Body() dto: CreateMovieDto) {
+    return this.moviesService.create(dto);
+  }
 
   @Delete('movies/:id')
   deleteMovie(@Param('id', ParseUUIDPipe) id: string) {
-    return this.moviesService.deleteMovie(id);
+    return this.moviesService.delete(id);
   }
 }
