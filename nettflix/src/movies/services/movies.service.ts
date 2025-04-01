@@ -43,4 +43,11 @@ export class MoviesService {
 
     return movie;
   }
+
+  deleteMovie(id: string): Movie {
+    const movie = this.getMovie(id);
+    this.db = this.db.filter((movie) => movie.id !== id);
+
+    return movie;
+  }
 }

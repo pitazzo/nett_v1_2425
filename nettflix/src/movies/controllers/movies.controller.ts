@@ -27,8 +27,6 @@ export class MoviesController {
 
   @Delete('movies/:id')
   deleteMovie(@Param('id', ParseUUIDPipe) id: string) {
-    console.log(
-      `soy el controller de deleteMovie y me piden borrar la peli con ID ${id}`,
-    );
+    return this.moviesService.deleteMovie(id);
   }
 }
