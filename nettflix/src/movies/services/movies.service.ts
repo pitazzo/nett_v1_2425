@@ -32,8 +32,12 @@ export class MoviesService {
     },
   ];
 
-  getAll(): Movie[] {
-    return this.db;
+  filter(isSaga: boolean | undefined): Movie[] {
+    if (isSaga === undefined) {
+      return this.db;
+    }
+
+    return this.db.filter((movie) => movie.isSaga === isSaga);
   }
 
   get(id: string): Movie {

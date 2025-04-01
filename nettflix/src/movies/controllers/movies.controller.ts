@@ -4,9 +4,11 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
 import { UpdateMovieDto } from 'src/movies/dtos/update-movie.dto';
@@ -17,8 +19,10 @@ export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
   @Get('movies')
-  getAllMovies() {
-    return this.moviesService.getAll();
+  getAllMovies(
+    @Query('isSaga', new ParseBoolPipe({ optional: true })) isSaga: boolean,
+  ) {
+    return this.moviesService.filter(isSaga);
   }
 
   @Get('movies/:id')
