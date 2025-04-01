@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
+import { MovieListDto } from 'src/movies/dtos/movie-list.dto';
 import { UpdateMovieDto } from 'src/movies/dtos/update-movie.dto';
 import { Movie } from 'src/movies/models/movie.model';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,6 +14,7 @@ export class MoviesService {
       duration: 120,
       director: 'Kubrick',
       isSaga: false,
+      reviews: [],
     },
     {
       id: '58e816d4-4969-4276-866e-a0832af9a5fc',
@@ -21,6 +23,12 @@ export class MoviesService {
       duration: 90,
       director: 'Billy Wilder',
       isSaga: false,
+      reviews: [
+        {
+          text: 'la mejor película de la historia! 🚀',
+          score: 10,
+        },
+      ],
     },
     {
       id: '13577b18-bdce-4127-a951-4a4215334404',
@@ -29,15 +37,18 @@ export class MoviesService {
       duration: 100,
       director: 'Chris Columbus',
       isSaga: true,
+      reviews: [],
     },
   ];
 
-  filter(isSaga: boolean | undefined): Movie[] {
+  filter(isSaga: boolean | undefined): MovieListDto[] {
     if (isSaga === undefined) {
-      return this.db;
+      return this.db.map((movie) => MovieListDto.fromEntity(movie));
     }
 
-    return this.db.filter((movie) => movie.isSaga === isSaga);
+    return this.db
+      .filter((movie) => movie.isSaga === isSaga)
+      .map((movie) => MovieListDto.fromEntity(movie));
   }
 
   get(id: string): Movie {
@@ -58,7 +69,7 @@ export class MoviesService {
   }
 
   create(dto: CreateMovieDto): Movie {
-    const movie = { id: uuidv4(), ...dto };
+    const movie = { id: uuidv4(), ...dto, reviews: [] };
     this.db.push(movie);
     return movie;
   }
