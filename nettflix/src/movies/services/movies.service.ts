@@ -1,14 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
 import { CreateReviewDto } from 'src/movies/dtos/create-review.dto';
 import { MovieListDto } from 'src/movies/dtos/movie-list.dto';
 import { UpdateMovieDto } from 'src/movies/dtos/update-movie.dto';
 import { Movie } from 'src/movies/models/movie.model';
+import { Review } from 'src/movies/models/review.model';
+import { ModerationService } from 'src/movies/services/moderation.service';
 import { SynopsisService } from 'src/movies/services/synopsis.service';
 import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class MoviesService {
-  constructor(private readonly synopsisService: SynopsisService) {}
+  constructor(
+    private readonly synopsisService: SynopsisService,
+    private readonly moderationService: ModerationService,
+  ) {}
 
   db: Movie[] = [
     {
@@ -91,8 +100,17 @@ export class MoviesService {
     return updateMovie;
   }
 
-  reviewMovie(id: string, dto: CreateReviewDto) {
+  async reviewMovie(id: string, dto: CreateReviewDto): Promise<Review> {
     const movie = this.get(id);
+
+    const isAcceptable = await this.moderationService.isAcceptable(dto.text);
+
+    if (!isAcceptable) {
+      throw new NotAcceptableException(
+        'Your review violates our content policy',
+      );
+    }
+
     const review = { id: uuidv4(), ...dto };
     movie.reviews.push(review);
 
