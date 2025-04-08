@@ -1,30 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
-
-import axios from 'axios';
+import { AIService } from 'src/movies/services/ai.service';
 
 @Injectable()
 export class SynopsisService {
+  constructor(private readonly aiService: AIService) {}
+
   async createSynopsis(dto: CreateMovieDto): Promise<string> {
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4-turbo',
-        messages: [
-          {
-            role: 'user',
-            content: `Hazme una breve sinopsis de la película ${dto.title}`,
-          },
-        ],
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.OPEN_AI_API_KEY}`,
-        },
-      },
+    const response = await this.aiService.ask(
+      `Hazme una breve sinopsis de la película ${dto.title}`,
     );
 
-    return response.data.choices[0].message.content;
+    return response;
   }
 }
