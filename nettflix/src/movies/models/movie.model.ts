@@ -9,5 +9,6 @@ export class Movie {
     public director: string,
     public isSaga: boolean,
     public reviews: Review[],
+    public synopsis: string,
   ) {}
 }

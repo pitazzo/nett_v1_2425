@@ -4,9 +4,12 @@ import { CreateReviewDto } from 'src/movies/dtos/create-review.dto';
 import { MovieListDto } from 'src/movies/dtos/movie-list.dto';
 import { UpdateMovieDto } from 'src/movies/dtos/update-movie.dto';
 import { Movie } from 'src/movies/models/movie.model';
+import { SynopsisService } from 'src/movies/services/synopsis.service';
 import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class MoviesService {
+  constructor(private readonly synopsisService: SynopsisService) {}
+
   db: Movie[] = [
     {
       id: '2aa1cc7c-ae73-4a21-b354-f19b243a7e5b',
@@ -16,6 +19,7 @@ export class MoviesService {
       director: 'Kubrick',
       isSaga: false,
       reviews: [],
+      synopsis: 'Bla bla bla',
     },
     {
       id: '58e816d4-4969-4276-866e-a0832af9a5fc',
@@ -25,6 +29,7 @@ export class MoviesService {
       director: 'Billy Wilder',
       isSaga: false,
       reviews: [],
+      synopsis: 'Bla bla bla',
     },
     {
       id: '13577b18-bdce-4127-a951-4a4215334404',
@@ -34,6 +39,7 @@ export class MoviesService {
       director: 'Chris Columbus',
       isSaga: true,
       reviews: [],
+      synopsis: 'Bla bla bla',
     },
   ];
 
@@ -64,8 +70,13 @@ export class MoviesService {
     return movie;
   }
 
-  create(dto: CreateMovieDto): Movie {
-    const movie = { id: uuidv4(), ...dto, reviews: [] };
+  async create(dto: CreateMovieDto): Promise<Movie> {
+    const movie = {
+      id: uuidv4(),
+      ...dto,
+      reviews: [],
+      synopsis: await this.synopsisService.createSynopsis(dto),
+    };
     this.db.push(movie);
     return movie;
   }
