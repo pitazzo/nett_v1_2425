@@ -24,16 +24,7 @@ export class MoviesService {
       duration: 90,
       director: 'Billy Wilder',
       isSaga: false,
-      reviews: [
-        {
-          text: 'la mejor película de la historia! 🚀',
-          score: 10,
-        },
-        {
-          text: 'no me gustó nada :(',
-          score: 2,
-        },
-      ],
+      reviews: [],
     },
     {
       id: '13577b18-bdce-4127-a951-4a4215334404',
@@ -91,9 +82,26 @@ export class MoviesService {
 
   reviewMovie(id: string, dto: CreateReviewDto) {
     const movie = this.get(id);
+    const review = { id: uuidv4(), ...dto };
+    movie.reviews.push(review);
 
-    movie.reviews.push(dto);
+    return review;
+  }
 
-    return dto;
+  deleteReview(movieId: string, reviewId: string) {
+    const movie = this.get(movieId);
+    const reviewToDelte = movie.reviews.find(
+      (review) => review.id === reviewId,
+    );
+
+    if (!reviewToDelte) {
+      throw new NotFoundException(
+        `Can not find review ${reviewId} of movie ${movieId}`,
+      );
+    }
+
+    movie.reviews = movie.reviews.filter((review) => review.id !== reviewId);
+
+    return reviewToDelte;
   }
 }
