@@ -4,12 +4,15 @@ meta {
   seq: 4
 }
 
-get {
-  url: http://localhost:3000/movies
+post {
+  url: http://localhost:3000/movies/2aa1cc7c-ae73-4a21-b354-f19b243a7e5b/review
   body: json
   auth: none
 }
 
 body:json {
-  {}
+  {
+    "text": "Mediocre",
+    "score": 5
+  }
 }

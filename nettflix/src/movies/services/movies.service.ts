@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
+import { CreateReviewDto } from 'src/movies/dtos/create-review.dto';
 import { MovieListDto } from 'src/movies/dtos/movie-list.dto';
 import { UpdateMovieDto } from 'src/movies/dtos/update-movie.dto';
 import { Movie } from 'src/movies/models/movie.model';
@@ -27,6 +28,10 @@ export class MoviesService {
         {
           text: 'la mejor película de la historia! 🚀',
           score: 10,
+        },
+        {
+          text: 'no me gustó nada :(',
+          score: 2,
         },
       ],
     },
@@ -82,5 +87,13 @@ export class MoviesService {
     this.db[index] = updateMovie;
 
     return updateMovie;
+  }
+
+  reviewMovie(id: string, dto: CreateReviewDto) {
+    const movie = this.get(id);
+
+    movie.reviews.push(dto);
+
+    return dto;
   }
 }
