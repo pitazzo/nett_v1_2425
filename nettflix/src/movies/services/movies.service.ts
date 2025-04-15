@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
 import { MovieListDto } from 'src/movies/dtos/movie-list.dto';
 import { UpdateMovieDto } from 'src/movies/dtos/update-movie.dto';
@@ -7,6 +7,8 @@ import { ModerationService } from 'src/movies/services/moderation.service';
 import { SynopsisService } from 'src/movies/services/synopsis.service';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateReviewDto } from 'src/movies/dtos/create-review.dto';
+import { Review } from 'src/movies/models/review.model';
 
 @Injectable()
 export class MoviesService {
@@ -15,6 +17,8 @@ export class MoviesService {
     private readonly moderationService: ModerationService,
     @InjectRepository(Movie)
     private readonly moviesRepository: Repository<Movie>,
+    @InjectRepository(Review)
+    private readonly reviewsRepository: Repository<Review>,
   ) {}
 
   async filter(isSaga: boolean | undefined): Promise<MovieListDto[]> {
@@ -32,7 +36,10 @@ export class MoviesService {
   }
 
   async get(id: string): Promise<Movie> {
-    return this.moviesRepository.findOneOrFail({ where: { id: id } });
+    return this.moviesRepository.findOneOrFail({
+      where: { id: id },
+      relations: ['reviews'],
+    });
   }
 
   async delete(id: string): Promise<Movie> {
@@ -63,37 +70,39 @@ export class MoviesService {
     return updateMovie;
   }
 
-  // async reviewMovie(id: string, dto: CreateReviewDto): Promise<Review> {
-  //   const movie = this.get(id);
+  async reviewMovie(id: string, dto: CreateReviewDto): Promise<Review> {
+    const movie = await this.get(id);
 
-  //   const isAcceptable = await this.moderationService.isAcceptable(dto.text);
+    const isAcceptable = await this.moderationService.isAcceptable(dto.text);
 
-  //   if (!isAcceptable) {
-  //     throw new NotAcceptableException(
-  //       'Your review violates our content policy',
-  //     );
-  //   }
+    if (!isAcceptable) {
+      throw new NotAcceptableException(
+        'Your review violates our content policy',
+      );
+    }
 
-  //   const review = { id: uuidv4(), ...dto };
-  //   movie.reviews.push(review);
+    const review = this.reviewsRepository.create({
+      text: dto.text,
+      score: dto.score,
+      movie: {
+        id: movie.id,
+      },
+    });
 
-  //   return review;
-  // }
+    await this.reviewsRepository.save(review);
 
-  // deleteReview(movieId: string, reviewId: string) {
-  //   const movie = this.get(movieId);
-  //   const reviewToDelte = movie.reviews.find(
-  //     (review) => review.id === reviewId,
-  //   );
+    return review;
+  }
 
-  //   if (!reviewToDelte) {
-  //     throw new NotFoundException(
-  //       `Can not find review ${reviewId} of movie ${movieId}`,
-  //     );
-  //   }
+  async deleteReview(movieId: string, reviewId: string): Promise<Review> {
+    await this.get(movieId);
 
-  //   movie.reviews = movie.reviews.filter((review) => review.id !== reviewId);
+    const reviewToDelte = this.reviewsRepository.findOneOrFail({
+      where: { id: reviewId },
+    });
 
-  //   return reviewToDelte;
-  // }
+    await this.reviewsRepository.delete({ id: reviewId });
+
+    return reviewToDelte;
+  }
 }

@@ -1,6 +1,6 @@
-// import { Review } from 'src/movies/models/review.model';
+import { Review } from 'src/movies/models/review.model';
 
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Movie {
@@ -22,7 +22,8 @@ export class Movie {
   @Column()
   public isSaga: boolean;
 
-  // public reviews: Review[];
+  @OneToMany(() => Review, (review) => review.movie)
+  public reviews: Review[];
 
   @Column()
   public synopsis: string;
