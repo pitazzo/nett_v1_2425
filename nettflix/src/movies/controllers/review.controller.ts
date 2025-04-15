@@ -18,7 +18,7 @@ export class ReviewsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: CreateReviewDto,
   ) {
-    return this.moviesService.reviewMovie(id, dto);
+    // return this.moviesService.reviewMovie(id, dto);
   }
 
   @Delete('movies/:movieId/reviews/:reviewId')
@@ -26,6 +26,6 @@ export class ReviewsController {
     @Param('movieId', ParseUUIDPipe) movieId: string,
     @Param('reviewId', ParseUUIDPipe) reviewId: string,
   ) {
-    return this.moviesService.deleteReview(movieId, reviewId);
+    // return this.moviesService.deleteReview(movieId, reviewId);
   }
 }
