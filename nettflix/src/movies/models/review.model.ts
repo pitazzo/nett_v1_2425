@@ -1,3 +1,4 @@
+import { User } from 'src/auth/models/user.model';
 import { Movie } from 'src/movies/models/movie.model';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -14,4 +15,7 @@ export class Review {
 
   @ManyToOne(() => Movie, (movie) => movie.reviews)
   public movie: Movie;
+
+  @ManyToOne(() => User, (user) => user.reviews)
+  public author: User;
 }

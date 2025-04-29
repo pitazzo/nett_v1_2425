@@ -1,4 +1,8 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotAcceptableException,
+} from '@nestjs/common';
 import { CreateMovieDto } from 'src/movies/dtos/create-movie.dto';
 import { MovieListDto } from 'src/movies/dtos/movie-list.dto';
 import { UpdateMovieDto } from 'src/movies/dtos/update-movie.dto';
@@ -70,7 +74,11 @@ export class MoviesService {
     return updateMovie;
   }
 
-  async reviewMovie(id: string, dto: CreateReviewDto): Promise<Review> {
+  async reviewMovie(
+    id: string,
+    dto: CreateReviewDto,
+    userId: string,
+  ): Promise<Review> {
     const movie = await this.get(id);
 
     const isAcceptable = await this.moderationService.isAcceptable(dto.text);
@@ -87,6 +95,9 @@ export class MoviesService {
       movie: {
         id: movie.id,
       },
+      author: {
+        id: userId,
+      },
     });
 
     await this.reviewsRepository.save(review);
@@ -94,12 +105,21 @@ export class MoviesService {
     return review;
   }
 
-  async deleteReview(movieId: string, reviewId: string): Promise<Review> {
+  async deleteReview(
+    movieId: string,
+    reviewId: string,
+    userId: string,
+  ): Promise<Review> {
     await this.get(movieId);
 
-    const reviewToDelte = this.reviewsRepository.findOneOrFail({
+    const reviewToDelte = await this.reviewsRepository.findOneOrFail({
       where: { id: reviewId },
+      relations: ['author'],
     });
+
+    if (reviewToDelte.author.id !== userId) {
+      throw new BadRequestException('You can only delete your own reviews');
+    }
 
     await this.reviewsRepository.delete({ id: reviewId });
 

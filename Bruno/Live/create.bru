@@ -4,12 +4,19 @@ meta {
   seq: 8
 }
 
-get {
-  url: http://localhost:3000/movies
+post {
+  url: http://localhost:3000/movies/6db60ad1-a9d3-4cc3-99a8-111234a97558/reviews
   body: json
   auth: none
 }
 
+headers {
+  Authorization: fsdfdsfsdf
+}
+
 body:json {
-  {}
+  {
+    "score": 0,
+    "text": "muy mala"
+  }
 }

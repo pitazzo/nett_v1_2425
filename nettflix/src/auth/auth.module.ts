@@ -5,6 +5,8 @@ import { AuthController } from 'src/auth/controllers/auth.controller';
 import { User } from 'src/auth/models/user.model';
 import { UsersService } from 'src/auth/services/users.service';
 import 'dotenv/config';
+import { JWTGuard } from 'src/auth/guards/jwt.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -13,11 +15,19 @@ import 'dotenv/config';
       global: true,
       secret: process.env.JWT_SECRET,
       signOptions: {
-        expiresIn: '60s',
+        expiresIn: '600s',
       },
     }),
   ],
   controllers: [AuthController],
-  providers: [UsersService],
+  providers: [
+    UsersService,
+    JWTGuard,
+    {
+      provide: APP_GUARD,
+      useClass: JWTGuard,
+    },
+  ],
+  exports: [JWTGuard],
 })
 export class AuthModule {}
