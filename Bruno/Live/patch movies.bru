@@ -4,12 +4,14 @@ meta {
   seq: 9
 }
 
-get {
-  url: http://localhost:3000/movies
+patch {
+  url: http://localhost:3000/movies/6db60ad1-a9d3-4cc3-99a8-111234a97558
   body: json
   auth: none
 }
 
 body:json {
-  {}
+  {
+    "title": "Rear window"
+  }
 }
